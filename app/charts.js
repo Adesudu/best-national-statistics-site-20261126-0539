@@ -29,7 +29,13 @@ export function lineChart(series, opts = {}) {
     .map((p, i) => `<text x="${x(i).toFixed(1)}" y="${h - 10}" text-anchor="middle" font-size="12" fill="#5a5648">${p.year}</text>`)
     .join('');
   const valuesText = series
-    .map((p, i) => `<text x="${x(i).toFixed(1)}" y="${(y(p.value) - 10).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#33302a">${p.value}${opts.unit || ''}</text>`)
+    .map((p, i) => {
+      // Edge labels are anchored inward so they never collide with the
+      // y-axis gridline labels at the chart's left edge.
+      const anchor = i === 0 ? 'start' : i === series.length - 1 ? 'end' : 'middle';
+      const lx = i === 0 ? x(i) + 6 : i === series.length - 1 ? x(i) - 6 : x(i);
+      return `<text x="${lx.toFixed(1)}" y="${(y(p.value) - 10).toFixed(1)}" text-anchor="${anchor}" font-size="11.5" font-weight="600" fill="#33302a">${p.value}${opts.unit || ''}</text>`;
+    })
     .join('');
   const grid = [0, 0.5, 1].map((f) => {
     const gv = lo + f * (hi - lo);

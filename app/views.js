@@ -34,7 +34,7 @@ function card(h) {
   return `<article class="card">
     <h3>${esc(h.label)}</h3>
     <p class="big">${esc(h.value)}</p>
-    <p class="detail">${esc(h.detail || '')}</p>
+    <p class="sub">${esc(h.detail || '')}</p>
     ${srcLine(h.source, h.year)}
   </article>`;
 }
@@ -188,7 +188,7 @@ function renderRegions() {
       <div><strong>${fmt(PROVINCE_FACTS.landAreaKm2)} km²</strong><span>land area</span></div>
       <div><strong>16,165/km²</strong><span>Jakarta’s density — the densest province</span></div>
     </div>
-    <div class="chart-box">${barChart(PROVINCES_TOP10.map((p) => ({ label: p.name.replace(' ', ' '), value: Math.round(p.population / 1000000) })), { unit: 'm', label: 'Population of the ten largest provinces, millions' })}</div>
+    <div class="chart-box">${hbarChart(PROVINCES_TOP10.map((p) => ({ label: p.name, value: Math.round(p.population / 1000000) })), { unit: 'm', label: 'Population of the ten largest provinces, millions' })}</div>
     <p class="caption">Population of the ten largest provinces, in millions (BPS, mid-2024). Tap a row in the table below for its details.</p>
   </section>
   <section>
