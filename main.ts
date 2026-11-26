@@ -13,7 +13,7 @@
 // program runs twice — both runs must write identical bytes, so nothing
 // here depends on the clock, on randomness, or on the environment.
 
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-frontend.ts';
@@ -26,9 +26,14 @@ const repoRoot = fileURLToPath(new URL('.', import.meta.url));
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
 // Start from a clean output directory so a stale file from an earlier
-// run can never leak into the hand-in.
-rmSync(outputDir, { recursive: true, force: true });
+// run can never leak into the hand-in. Never remove the output
+// directory itself: the grader runs as user 65534 with the output
+// directory's parent read-only, so deleting the directory would fail
+// with EACCES. Create it if missing, then remove only its contents.
 mkdirSync(outputDir, { recursive: true });
+for (const entry of readdirSync(outputDir)) {
+  rmSync(join(outputDir, entry), { recursive: true, force: true });
+}
 
 // The site, exactly as it is in the repository.
 cpSync(join(repoRoot, 'app'), join(outputDir, 'app'), { recursive: true });
